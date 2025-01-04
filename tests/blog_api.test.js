@@ -26,6 +26,13 @@ describe("testing get request", () => {
         const body = response.body
         assert.strictEqual(body.length, helper.initialBlogs.length)
     })
+
+    test("unique identifer is called id and is not null", async () => {
+        const response = await api.get("/api/blogs")
+        const blogs = response.body
+
+        blogs.forEach(blog => assert(Object.hasOwn(blog, "id") && blog.id != null))
+    })
 })
 
 after(async () => {

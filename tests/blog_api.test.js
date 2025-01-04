@@ -35,6 +35,37 @@ describe("testing get request", () => {
     })
 })
 
+describe("testing post request", () => {
+    const newBlog = {
+        title: "11 Tips for Writing Efficient Java",
+        author: "John Smith",
+        url: "https://example.com/efficient-javascript-tips-v2",
+        likes: 264
+    }
+
+    test("correct type and response status", async () => {
+        await api.post("/api/blogs").send(newBlog)
+            .expect(201)
+            .expect("Content-Type", /application\/json/)
+    })
+
+    test("correct number of blogs are returned", async () => {
+        await api.post("/api/blogs").send(newBlog)
+
+        const response = await api.get("/api/blogs")
+        const body = response.body
+        assert.strictEqual(body.length, helper.initialBlogs.length + 1)
+    })
+
+    test("the database contains the new added blog", async () => {
+        await api.post("/api/blogs").send(newBlog)
+
+        const response = await api.get("/api/blogs")
+        const titles = response.body.map(blog => blog.title)
+        assert(titles.includes("11 Tips for Writing Efficient Java"))
+    })
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

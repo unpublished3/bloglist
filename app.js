@@ -8,6 +8,7 @@ const middleware = require("./utils/middleware")
 
 mongoose.connect(config.MONGODB_URI)
 
+require("express-async-errors")
 const app = express()
 
 app.use(cors())

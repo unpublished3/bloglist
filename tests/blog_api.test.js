@@ -66,19 +66,40 @@ describe("testing post request", () => {
     })
 })
 
-test("likes defaults to zero if property absent", async () => {
-    const newBlogWithoutLikes = {
-        title: "Bottom 5 Web Development Frameworks in 2025",
-        author: "Alice Johnson",
-        url: "https://example.com/bottom-web-frameworks-2025",
-    }
-    await api.post("/api/blogs").send(newBlogWithoutLikes)
+describe.only("testing validations", async () => {
+    test("likes defaults to zero if property absent", async () => {
+        const newBlogWithoutLikes = {
+            title: "Bottom 5 Web Development Frameworks in 2025",
+            author: "Alice Johnson",
+            url: "https://example.com/bottom-web-frameworks-2025",
+        }
+        await api.post("/api/blogs").send(newBlogWithoutLikes)
 
-    const response = await api.get("/api/blogs")
-    const newlyCreatedBlog = response.body.find(blog => blog.title === "Bottom 5 Web Development Frameworks in 2025")
+        const response = await api.get("/api/blogs")
+        const newlyCreatedBlog = response.body.find(blog => blog.title === "Bottom 5 Web Development Frameworks in 2025")
 
-    assert(Object.hasOwn(newlyCreatedBlog, "likes"))
-    assert(newlyCreatedBlog.likes === 0)
+        assert(Object.hasOwn(newlyCreatedBlog, "likes"))
+        assert(newlyCreatedBlog.likes === 0)
+    })
+
+    test("title property missing", async () => {
+        const blogWithoutTitle = {
+            author: "Bryan Johnson",
+            url: "https://example.com/i-wanna-live-forever",
+            likes: 230
+        }
+        await api.post("/api/blogs").send(blogWithoutTitle).expect(400)
+    })
+
+    test("url property missing", async () => {
+        const blogWithoutUrl = {
+            title: "How I plan to live forever",
+            author: "Bryan Johnson",
+            likes: 230
+        }
+        await api.post("/api/blogs").send(blogWithoutUrl).expect(400)
+    })
+
 })
 
 after(async () => {

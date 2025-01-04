@@ -66,6 +66,21 @@ describe("testing post request", () => {
     })
 })
 
+test("likes defaults to zero if property absent", async () => {
+    const newBlogWithoutLikes = {
+        title: "Bottom 5 Web Development Frameworks in 2025",
+        author: "Alice Johnson",
+        url: "https://example.com/bottom-web-frameworks-2025",
+    }
+    await api.post("/api/blogs").send(newBlogWithoutLikes)
+
+    const response = await api.get("/api/blogs")
+    const newlyCreatedBlog = response.body.find(blog => blog.title === "Bottom 5 Web Development Frameworks in 2025")
+
+    assert(Object.hasOwn(newlyCreatedBlog, "likes"))
+    assert(newlyCreatedBlog.likes === 0)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

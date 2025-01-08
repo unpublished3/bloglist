@@ -6,6 +6,7 @@ const mongoose = require("mongoose")
 const app = require("../app")
 const Blog = require("../models/blogs")
 const helper = require("./test_helper")
+const { update } = require("lodash")
 
 const api = supertest(app)
 
@@ -128,6 +129,50 @@ describe("testing deletions", () => {
         const newBlogs = newResponse.body
         const deletedBlogExists = newBlogs.some(blog => blog.id === blogToBeDeleted.id)
         assert(!deletedBlogExists)
+    })
+})
+
+describe.only("testing put requests", () => {
+    test.only("returns a 200 status code and correct type", async () => {
+        const response = await api.get("/api/blogs")
+        const blogToBeUpdated = response.body[0]
+        const newLikes = blogToBeUpdated.likes * 2 + 1
+
+        await api.put(`/api/blogs/${blogToBeUpdated.id}`)
+            .send({ ...blogToBeUpdated, likes: newLikes })
+            .expect(200)
+            .expect("Content-Type", /application\/json/)
+    })
+
+    test.only("likes field is updated", async () => {
+        const response = await api.get("/api/blogs")
+        const blogToBeUpdated = response.body[0]
+        const newLikes = blogToBeUpdated.likes * 2 + 1
+        await api.put(`/api/blogs/${blogToBeUpdated.id}`)
+            .send({ ...blogToBeUpdated, likes: newLikes })
+
+        const newResponse = await api.get("/api/blogs")
+        const updatedBlog = newResponse.body.find(blog => blog.id === blogToBeUpdated.id)
+        assert.strictEqual(updatedBlog.likes, newLikes)
+    })
+
+    test.only("other fields are not changes", async () => {
+        const response = await api.get("/api/blogs")
+        const blogToBeUpdated = response.body[0]
+        const newLikes = blogToBeUpdated.likes * 2 + 1
+        await api.put(`/api/blogs/${blogToBeUpdated.id}`)
+            .send({ ...blogToBeUpdated, likes: newLikes })
+
+        const newResponse = await api.get("/api/blogs")
+        const updatedBlog = newResponse.body.find(blog => blog.id === blogToBeUpdated.id)
+
+        assert.strictEqual(updatedBlog.title, blogToBeUpdated.title)
+        assert.strictEqual(updatedBlog.author, blogToBeUpdated.author)
+        assert.strictEqual(updatedBlog.url, blogToBeUpdated.url)
+    })
+
+    test.only("trying to update non-existing blog fails", async () => {
+        await api.put("/api/blogs/677602f2209b6a2eff301589").send(helper.initialBlogs[0]).expect(404)
     })
 })
 

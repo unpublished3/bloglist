@@ -65,7 +65,7 @@ describe("testing post request", () => {
     })
 })
 
-describe.only("testing validations", async () => {
+describe("testing validations", () => {
     test("likes defaults to zero if property absent", async () => {
         const newBlogWithoutLikes = {
             title: "Bottom 5 Web Development Frameworks in 2025",
@@ -99,6 +99,36 @@ describe.only("testing validations", async () => {
         await api.post("/api/blogs").send(blogWithoutUrl).expect(400)
     })
 
+})
+
+describe("testing deletions", () => {
+    test("returns a 204 status code", async () => {
+        const response = await api.get("/api/blogs")
+        const blogToBeDeleted = response.body[0]
+
+        await api.delete(`/api/blogs/${blogToBeDeleted.id}`).expect(204)
+    })
+
+    test("correct number of blogs are present after deletion", async () => {
+        const response = await api.get("/api/blogs")
+        const blogToBeDeleted = response.body[0]
+        await api.delete(`/api/blogs/${blogToBeDeleted.id}`)
+
+        const newResponse = await api.get("/api/blogs")
+        const newBlogs = newResponse.body
+        assert.strictEqual(newBlogs.length, helper.initialBlogs.length - 1)
+    })
+
+    test("deleted blog is not in the new blogs", async () => {
+        const response = await api.get("/api/blogs")
+        const blogToBeDeleted = response.body[0]
+        await api.delete(`/api/blogs/${blogToBeDeleted.id}`)
+
+        const newResponse = await api.get("/api/blogs")
+        const newBlogs = newResponse.body
+        const deletedBlogExists = newBlogs.some(blog => blog.id === blogToBeDeleted.id)
+        assert(!deletedBlogExists)
+    })
 })
 
 after(async () => {

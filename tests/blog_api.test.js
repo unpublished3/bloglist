@@ -13,7 +13,6 @@ beforeEach(async () => {
     await Blog.deleteMany({})
     const promiseArray = helper.initialBlogs.map(blog => Blog(blog).save())
     await Promise.all(promiseArray)
-    console.log("Done")
 })
 
 describe("testing get request", () => {

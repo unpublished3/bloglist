@@ -25,7 +25,6 @@ const mostLikes = (blogs) => {
         else
             authors[blog.author] = blog.likes
     })
-    console.log(authors)
 
     const mostLikedAuthor = _.maxBy(Object.entries(authors), ([key, value]) => value)
     return { author: mostLikedAuthor[0], likes: mostLikedAuthor[1] }

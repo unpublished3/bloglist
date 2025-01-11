@@ -33,4 +33,32 @@ const initialBlogs = [
     }
 ]
 
-module.exports = { initialBlogs }
+const initialUsers = [
+    {
+        username: 'john_doe',
+        name: 'John Doe',
+        password: 'password123'
+    },
+    {
+        username: 'jane_smith',
+        name: 'Jane Smith',
+        password: 'mysecurepass'
+    },
+    {
+        username: 'alex_williams',
+        name: 'Alex Williams',
+        password: 'alexpassword2025'
+    },
+    {
+        username: 'emily_jones',
+        name: 'Emily Jones',
+        password: 'emilysecret'
+    },
+    {
+        username: 'michael_brown',
+        name: 'Michael Brown',
+        password: 'michael1234'
+    }
+]
+
+module.exports = { initialBlogs, initialUsers }

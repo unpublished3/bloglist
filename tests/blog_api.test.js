@@ -131,8 +131,8 @@ describe("testing deletions", () => {
     })
 })
 
-describe.only("testing put requests", () => {
-    test.only("returns a 200 status code and correct type", async () => {
+describe("testing put requests", () => {
+    test("returns a 200 status code and correct type", async () => {
         const response = await api.get("/api/blogs")
         const blogToBeUpdated = response.body[0]
         const newLikes = blogToBeUpdated.likes * 2 + 1
@@ -143,7 +143,7 @@ describe.only("testing put requests", () => {
             .expect("Content-Type", /application\/json/)
     })
 
-    test.only("likes field is updated", async () => {
+    test("likes field is updated", async () => {
         const response = await api.get("/api/blogs")
         const blogToBeUpdated = response.body[0]
         const newLikes = blogToBeUpdated.likes * 2 + 1
@@ -155,7 +155,7 @@ describe.only("testing put requests", () => {
         assert.strictEqual(updatedBlog.likes, newLikes)
     })
 
-    test.only("other fields are not changes", async () => {
+    test("other fields are not changes", async () => {
         const response = await api.get("/api/blogs")
         const blogToBeUpdated = response.body[0]
         const newLikes = blogToBeUpdated.likes * 2 + 1
@@ -170,7 +170,7 @@ describe.only("testing put requests", () => {
         assert.strictEqual(updatedBlog.url, blogToBeUpdated.url)
     })
 
-    test.only("trying to update non-existing blog fails", async () => {
+    test("trying to update non-existing blog fails", async () => {
         await api.put("/api/blogs/677602f2209b6a2eff301589").send(helper.initialBlogs[0]).expect(404)
     })
 })

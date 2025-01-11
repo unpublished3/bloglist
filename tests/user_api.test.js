@@ -64,6 +64,43 @@ describe("testing post request", () => {
     })
 })
 
+describe("testing validations", () => {
+    test("username missing", async () => {
+        const userWithoutUsername = {
+            "name": "John Cena",
+            "password": "can'tCm3"
+        }
+        await api.post("/api/users").send(userWithoutUsername).expect(400)
+    })
+
+    test("username less than 3 characters long", async () => {
+        const invalidUsername = {
+            "username": "jo",
+            "name": "John Cena",
+            "password": "can'tCm3"
+        }
+        await api.post("/api/users").send(invalidUsername).expect(400)
+    })
+
+    test("username is not unique", async () => {
+        const repeatedUsername = {
+            "username": "john_doe",
+            "name": "John Cena",
+            "password": "can'tCm3"
+        }
+        await api.post("/api/users").send(repeatedUsername).expect(400)
+    })
+
+    test("password less than 3 characters long", async () => {
+        const invalidPassword = {
+            "username": "cena101",
+            "name": "John Cena",
+            "password": "ca"
+        }
+        await api.post("/api/users").send(invalidPassword).expect(400)
+    })    
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

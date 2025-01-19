@@ -2,21 +2,21 @@ require("express-async-errors")
 const blogsRouter = require("express").Router()
 const jwt = require("jsonwebtoken")
 const Blog = require("../models/blogs")
-const User = require("../models/users")
+const middleware = require("../utils/middleware")
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 })
     return response.json(blogs)
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     const decodedToken = jwt.verify(request.body.authorization, process.env.SECRET)
     if (!decodedToken.id) {
-        return response.status(401).json({error: "invalid token"})
+        return response.status(401).json({ error: "invalid token" })
     }
-    const user = await User.findById(decodedToken.id)
+    const user = await request.body.user
 
-    const blog = new Blog({...request.body, user: user._id})
+    const blog = new Blog({ ...request.body, user: user._id })
     const result = await blog.save()
 
     user.blogs = user.blogs.concat(result._id)
@@ -25,15 +25,15 @@ blogsRouter.post('/', async (request, response) => {
     return response.status(201).json(result)
 })
 
-blogsRouter.delete("/:id", async (request, response) => {
+blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) => {
     const decodedToken = jwt.verify(request.body.authorization, process.env.SECRET)
     if (!decodedToken.id) {
-        return response.status(401).json({error: "invalid token"})
+        return response.status(401).json({ error: "invalid token" })
     }
-    const user = await User.findById(decodedToken.id)
+    const user = await request.body.user
     const blog = await Blog.findById(request.params.id)
     if (user.id != blog.user.toString()) {
-        return response.status(401).json({error: "invalid user"})
+        return response.status(401).json({ error: "invalid user" })
     }
 
     await Blog.findByIdAndDelete(request.params.id)

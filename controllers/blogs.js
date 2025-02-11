@@ -41,8 +41,12 @@ blogsRouter.delete("/:id", middleware.userExtractor, async (request, response) =
 })
 
 blogsRouter.put("/:id", async (request, response) => {
-    const body = request.body
+    const decodedToken = jwt.verify(request.body.authorization, process.env.SECRET)
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: "invalid token" })
+    }
 
+    const body = request.body
     const blog = {
         title: body.title,
         author: body.author,

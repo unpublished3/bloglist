@@ -9,6 +9,11 @@ blogsRouter.get('/', async (request, response) => {
     return response.json(blogs)
 })
 
+blogsRouter.get('/:id', async (request, response) => {
+    const blog = await Blog.findById(request.params.id).populate("user", { username: 1, name: 1 })
+    return response.json(blog)
+})
+
 blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     const decodedToken = jwt.verify(request.body.authorization, process.env.SECRET)
     if (!decodedToken.id) {
@@ -54,7 +59,9 @@ blogsRouter.put("/:id", async (request, response) => {
         url: body.url
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    // Blog.populate()
+    const updatedBlog = await Blog.findById(request.params.id).populate("user", { username: 1, name: 1 })
     if (!updatedBlog)
         return response.status(404).end()
 
